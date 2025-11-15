@@ -9,7 +9,6 @@ const authRoutes = require("./routes/auth.js");
 const protectedRoute = require("./routes/protectedRoutes");
 const fetchUserDataRoute = require("./routes/fetchUserData.js");
 const uploadProfile = require("./routes/uploadProfile.js");
-const userRoutes = require("./routes/userRoutes");
 
 dotenv.config();
 
@@ -45,7 +44,6 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api", protectedRoute);
 app.use("/api/fetchUserData", fetchUserDataRoute);
-app.use("/api/user", userRoutes);
 app.use("/upload-profile", uploadProfile);
 app.use("/uploads", express.static("uploads"));
 
