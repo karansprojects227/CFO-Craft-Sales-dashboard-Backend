@@ -1,5 +1,6 @@
 const express =  require("express");
 const mongoose =  require("mongoose");
+const MongoStore = require("connect-mongo");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const session = require('express-session');
@@ -21,7 +22,12 @@ app.use(cookieParser());
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: { secure: false },
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      ttl: 60 * 60 * 24,
+    }),
 }));
 
 // ✅ Allow frontend to send cookies
