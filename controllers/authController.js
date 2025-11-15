@@ -102,8 +102,9 @@ const login = async (req, res) => {
     // 🔹 6. Save token in HTTP-only cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // true in production (https)
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
+      path: "/",
     });
 
     // 🔹 7. Send success response
