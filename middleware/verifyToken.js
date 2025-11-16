@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 
 module.exports = (req, res, next) => {
   const token = req.cookies.token; // ✅ from cookie
-  if (!token) return res.status(403).json({ message: "Access denied" });
+  if (!token) return res.status(403).json({ message: "Access denied! Please Login to continue..." });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
