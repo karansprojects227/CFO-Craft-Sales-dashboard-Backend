@@ -31,7 +31,7 @@ app.use(session({
     saveUninitialized: false,
     cookie: { secure: false },
     store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI,
+      mongoUrl: process.env.MONGO_URI,
       ttl: 60 * 60 * 24,
     }),
 }));
@@ -58,7 +58,7 @@ app.use("/api/auth", googleAuthRoute);
 
 // MongoDB connection
 mongoose
-.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => console.log("MongoDB connected"))
 .catch((err) => console.log(err));
 
