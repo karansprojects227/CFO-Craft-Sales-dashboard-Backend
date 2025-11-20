@@ -1,12 +1,10 @@
-const Redis = require("ioredis");
+import Redis from 'ioredis';
 
-const redisClient = new Redis({
-  host: "127.0.0.1",
-  port: 6379
+const redis = new Redis(process.env.UPSTASH_REDIS_URL, {
+  tls: { rejectUnauthorized: false } // Upstash TLS
 });
 
-redisClient.on("connect", () => {
-  console.log("Redis Connected");
-});
+redis.on('connect', () => console.log('Redis connected'));
+redis.on('error', (err) => console.error('Redis error', err));
 
-module.exports = redisClient;
+export default redis;
