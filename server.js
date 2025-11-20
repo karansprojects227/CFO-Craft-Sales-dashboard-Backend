@@ -58,7 +58,7 @@ app.use("/api/auth", googleAuthRoute);
 
 // MongoDB connection
 mongoose
-connect(process.env.MONGO_URI)
+.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB connected"))
 .catch((err) => console.log(err));
 
@@ -68,4 +68,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
 
