@@ -14,11 +14,12 @@ router.post("/", upload.single("profile"), async (req, res) => {
 
     // Convert image to Base64
     const base64Image = req.file.buffer.toString("base64");
+    
     const mimeType = req.file.mimetype;
-
+    
     const imageUrl = `data:${mimeType};base64,${base64Image}`;
 
-    // Save image Base64 in DB
+    // Save image filename in DB
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { profilePic: imageUrl },
