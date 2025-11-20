@@ -14,7 +14,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "http://localhost:3000/auth/login?error=GoogleAuthFailed",
+    failureRedirect: `${process.env.FRONTEND_URL}/auth/login?error=GoogleAuthFailed`,
   }),
   async (req, res) => {
     try {
@@ -116,7 +116,7 @@ router.get(
         });
 
         return res.redirect(
-          `http://localhost:3000/auth/verify-otp?email=${googleUser.email}`
+          `${process.env.FRONTEND_URL}/auth/verify-otp?email=${googleUser.email}`
         );
       }
 
