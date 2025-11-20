@@ -1,4 +1,4 @@
-import Redis from 'ioredis';
+const Redis = require('ioredis');
 
 const redis = new Redis(process.env.UPSTASH_REDIS_URL, {
   tls: { rejectUnauthorized: false } // Upstash TLS
@@ -7,4 +7,4 @@ const redis = new Redis(process.env.UPSTASH_REDIS_URL, {
 redis.on('connect', () => console.log('Redis connected'));
 redis.on('error', (err) => console.error('Redis error', err));
 
-export default redis;
+module.exports = redis;
