@@ -43,7 +43,7 @@ app.use(passport.session());
 // ✅ Allow frontend to send cookies
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin:process.env.FRONTEND_URL ,
     credentials: true, // allow cookies
   })
 );
@@ -68,6 +68,3 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-
-
