@@ -218,7 +218,7 @@ router.get(
 
       // Redirect to OTP page
       return res.redirect(
-        `${process.env.FRONTEND_URL}/auth/verify-otp?email=${googleUser.email}`
+        `${process.env.FRONTEND_URL}/auth/verify-otp`
       );
 
     } catch (err) {
@@ -229,4 +229,5 @@ router.get(
 );
 
 module.exports = router;
+
 
