@@ -148,7 +148,6 @@ const register = async (req, res) => {
     return res.status(200).json({ message: "Registration OTP sent!" });
 
   } catch (err) {
-    console.error("Register Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -159,6 +158,16 @@ const register = async (req, res) => {
 const verifyRegisterOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
+
+    // Validate input empty
+    if (!otp) {
+      return res.status(400).json({ message: "OTP are required!" });
+    }
+
+    // Validate input 6 digit or not
+    if (!/^\d{6}$/.test(otp)) {
+      return res.status(400).json({ message: "OTP must be 6 digits!" });
+    }
 
     const savedOtp = await redisClient.get(`otp:${email}`);
     if (!savedOtp) return res.status(400).json({ message: "OTP expired!" });
@@ -175,20 +184,20 @@ const verifyRegisterOtp = async (req, res) => {
     const user = await User.create(userData);
 
     // Delete redis keys
-    await redisClient.del(`regOtp:${email}`);
+    await redisClient.del(`otp:${email}`);
     await redisClient.del(`reg:${email}`);
 
     // Generate token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d"
-    });
+    // const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    //   expiresIn: "7d"
+    // });
 
-    // Save token in cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax"
-    });
+    // // Save token in cookie
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    //   secure: false,
+    //   sameSite: "lax"
+    // });
 
     return res.status(201).json({
       message: "Registered Successfull!",
@@ -332,6 +341,16 @@ const verifyLoginOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
 
+    // Validate input empty
+    if (!otp) {
+      return res.status(400).json({ message: "OTP are required!" });
+    }
+
+    // Validate input 6 digit or not
+    if (!/^\d{6}$/.test(otp)) {
+      return res.status(400).json({ message: "OTP must be 6 digits!" });
+    }
+
     const savedOtp = await redisClient.get(`otp:${email}`);
     if (!savedOtp) return res.status(400).json({ message: "OTP expired!" });
     if (savedOtp !== otp) return res.status(400).json({ message: "Invalid OTP!" });
@@ -420,14 +439,20 @@ const logout = (req, res) => {
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
+    
     const user = await User.findOne({ email });
 
     if (!user)
       return res.status(404).json({ error: "User with this email not found" });
 
     // Create a simple reset link (you can later make it token-based)
-    const resetLink = `http://localhost:3000/auth/reset-password/${user._id}`;
+    const resetLink = `${process.env.FRONTEND_URL}/auth/reset-password/${user._id}`;
+
+    // generate otp
     const otp = generateOTP();
+
+    // save otp separately
+    await redisClient.set(`otp:${email}`, otp, "EX", 300);
 
     // 🔹 Mail options
     const mailOptions = ({
@@ -553,12 +578,44 @@ const forgotPassword = async (req, res) => {
       })
     );
 
-    res.json({
-      message: `Reset link sent to your email.`,
-      userId: user._id,
-    });
+    res.json({message: `Reset link sent to your ${email}.`});
   } catch (err) {
     console.error("Forgot Password Error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// ------------------------------------
+// 🔁 RESET PASSWORD
+// ------------------------------------
+const resetPasswordVerifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    // Validate input empty
+    if (!otp) {
+      return res.status(400).json({ message: "OTP are required!" });
+    }
+
+    // Validate input 6 digit or not
+    if (!/^\d{6}$/.test(otp)) {
+      return res.status(400).json({ message: "OTP must be 6 digits!" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const savedOtp = await redisClient.get(`otp:${email}`);
+    if (!savedOtp) return res.status(400).json({ message: "OTP expired!" });
+    if (savedOtp !== otp) return res.status(400).json({ message: "Invalid OTP!" });
+
+    res.json({ 
+      message: "Password Reset OTP Verified!",
+      userId: user._id,
+     });
+    
+  } catch (err) {
+    console.error("Verify Password Reset OTP Error:", err);
     res.status(500).json({ error: "Server error" });
   }
 };
@@ -569,9 +626,8 @@ const forgotPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { password } = req.body;
-    const { confirmPassword } = req.body;
-    console.log(req.body);
+    const { password, confirmPassword } = req.body;
+
     if (password !== confirmPassword) {
       res.status(404).json({ error: "Passwords do not match!" });
       return;
@@ -604,7 +660,7 @@ const resetPassword = async (req, res) => {
 const sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
-    console.log(req.body);
+    
     if (!email) return res.status(400).json({ message: "Email is required!" });
 
     const otp = generateOTP();
@@ -705,6 +761,16 @@ const verifyOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
 
+    // Validate input empty
+    if (!otp) {
+      return res.status(400).json({ message: "OTP are required!" });
+    }
+
+    // Validate input 6 digit or not
+    if (!/^\d{6}$/.test(otp)) {
+      return res.status(400).json({ message: "OTP must be 6 digits!" });
+    }
+
     const savedOtp = await redisClient.get(`otp:${email}`);
     if (!savedOtp) return res.status(400).json({ message: "OTP expired!" });
     if (savedOtp !== otp) return res.status(400).json({ message: "Invalid OTP!" });
@@ -713,8 +779,6 @@ const verifyOtp = async (req, res) => {
     if (!tempData) return res.status(400).json({ message: "Session expired!" });
 
     const googleData = JSON.parse(tempData);
-
-    console.log("Google Data Inside Verify:", googleData.profilePic);
 
     let user = await User.findOne({ email });
 
@@ -759,6 +823,7 @@ module.exports = {
   logout,
   forgotPassword,
   resetPassword,
+  resetPasswordVerifyOtp,
   verifyOtp,
   sendOtp,
 };
