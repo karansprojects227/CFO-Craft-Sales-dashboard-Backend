@@ -65,7 +65,7 @@ const register = async (req, res) => {
 
     // Send email
     await resend.emails.send({
-      from: '"CFO Sales Dashboard" <info@cfocraft.com>',
+      from: "CFO Craft <otp@cfocraft.com>",
       to:email,
       subject: "🔐 Your Register Secure OTP Code",
       html: `
@@ -243,7 +243,7 @@ const login = async (req, res) => {
     await redisClient.set(`otp:${email}`, otp, "EX", 300);
 
     await resend.emails.send({
-      from: '"CFO Sales Dashboard" <info@cfocraft.com>',
+      from: "CFO Craft <otp@cfocraft.com>",
       to:email,
       subject: "🔐 Your Login Secure OTP Code",
       html: `
@@ -461,7 +461,7 @@ const forgotPassword = async (req, res) => {
       otp = null,
       subject = "🔐 Secure Password Reset",
     }) => ({
-      from: '"CFO Sales Dashboard" <info@cfocraft.com>',
+      from: "CFO Craft <otp@cfocraft.com>",
       to: user.email,
       subject: subject,
       html: `
@@ -677,7 +677,7 @@ const sendOtp = async (req, res) => {
     await redisClient.set(`otp:${email}`, otp, "EX", 300); // ex in 5 minute
 
     await resend.emails.send({
-      from: '"CFO Sales Dashboard" <info@cfocraft.com>',
+      from: "CFO Craft <otp@cfocraft.com>",
       to:email,
       subject: "🔐 Your Secure OTP Code",
       html: `
@@ -848,4 +848,5 @@ module.exports = {
   verifyOtp,
   sendOtp,
 };
+
 
