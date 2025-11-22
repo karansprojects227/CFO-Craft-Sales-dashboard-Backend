@@ -5,6 +5,7 @@ const generateOTP = require("../config/generateOTP");
 const transporter = require("../config/mail");
 const redisClient = require("../config/redis");
 const User = require("../models/user");
+const jwt = require("jsonwebtoken");
 
 router.get(
   "/google",
@@ -12,7 +13,7 @@ router.get(
 );
 
 router.get(
-  "/google/callback",
+  "/api/auth/google/callback",
   passport.authenticate("google", {
     failureRedirect: `${process.env.FRONTEND_URL}/auth/login?error=GoogleAuthFailed`,
   }),
@@ -26,6 +27,18 @@ router.get(
 
       // Check if user already exists in MongoDB
       const existingUser = await User.findOne({ email: googleUser.email });
+
+      // Generate token
+      const token = jwt.sign({ email: googleUser.email }, process.env.JWT_SECRET, {
+        expiresIn: "7d"
+      });
+
+      // store email in cookies
+      res.cookie("email_for_verification", token , {
+        httpOnly: true,     // cannot be accessed by JS
+        secure: false,      // true only on https
+        sameSite: "lax"
+      })
 
       if (existingUser) {
         // User exists → Still OTP required for login
@@ -229,5 +242,3 @@ router.get(
 );
 
 module.exports = router;
-
-
