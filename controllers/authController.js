@@ -659,7 +659,12 @@ const resetPassword = async (req, res) => {
 // ------------------------------------
 const sendOtp = async (req, res) => {
   try {
-    const { email } = req.body;
+    
+    // extracting email from cookie
+    const emialToken = req.cookies.email_for_verification; // ✅ from cookie
+
+    let email = jwt.verify(emialToken, process.env.JWT_SECRET);
+    email = email.email;
     
     if (!email) return res.status(400).json({ message: "Email is required!" });
 
@@ -759,7 +764,7 @@ const sendOtp = async (req, res) => {
 // ------------------------------------
 const verifyOtp = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { otp } = req.body;
 
     // Validate input empty
     if (!otp) {
@@ -770,6 +775,12 @@ const verifyOtp = async (req, res) => {
     if (!/^\d{6}$/.test(otp)) {
       return res.status(400).json({ message: "OTP must be 6 digits!" });
     }
+
+    // extracting email from cookie
+    const emialToken = req.cookies.email_for_verification; // ✅ from cookie
+
+    let email = jwt.verify(emialToken, process.env.JWT_SECRET);
+    email = email.email;
 
     const savedOtp = await redisClient.get(`otp:${email}`);
     if (!savedOtp) return res.status(400).json({ message: "OTP expired!" });
