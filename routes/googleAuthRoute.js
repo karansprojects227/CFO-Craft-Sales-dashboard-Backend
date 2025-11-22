@@ -48,7 +48,7 @@ router.get(
         await redisClient.set(`otp:${googleUser.email}`, otp, "EX", 300);
 
         await resend.emails.send({
-          from: '"CFO Sales Dashboard" <info@cfocraft.com>',
+          from: "CFO Craft <otp@cfocraft.com>",
           to: googleUser.email,
           subject: "🔐 Your Secure OTP Code",
           html: `
@@ -149,7 +149,7 @@ router.get(
 
       // Email OTP
       await resend.emails.send({
-          from: '"CFO Sales Dashboard" <info@cfocraft.com>',
+          from: "CFO Craft <otp@cfocraft.com>",
           to: googleUser.email,
           subject: "🔐 Your Secure OTP Code",
           html: `
@@ -242,4 +242,5 @@ router.get(
 );
 
 module.exports = router;
+
 
