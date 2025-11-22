@@ -187,6 +187,18 @@ const verifyRegisterOtp = async (req, res) => {
     await redisClient.del(`otp:${email}`);
     await redisClient.del(`reg:${email}`);
 
+    // Generate token
+    // const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    //   expiresIn: "7d"
+    // });
+
+    // // Save token in cookie
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    //   secure: false,
+    //   sameSite: "lax"
+    // });
+
     return res.status(201).json({
       message: "Registered Successfull!",
       userId: user._id
@@ -354,11 +366,10 @@ const verifyLoginOtp = async (req, res) => {
       expiresIn: "7d"
     });
 
-    // // Save token in cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none"
+      secure: false,
+      sameSite: "lax"
     });
 
     return res.status(200).json({
@@ -393,16 +404,14 @@ const checkPass = async (req, res) => {
     if (!isMatch)
       return res.status(400).json({ message: "Incorrect password!" });
 
-    // Generate token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d"
+      expiresIn: "1d"
     });
 
-    // // Save token in cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none"
+      secure: false,
+      sameSite: "lax"
     });
 
     return res.status(200).json({
@@ -768,10 +777,15 @@ const verifyOtp = async (req, res) => {
     }
 
     // extracting email from cookie
-    const emialToken = req.cookies.email_for_verification; // ✅ from cookie
+    const emailToken = req.cookies.email_for_verification; // ✅ from cookie
 
-    let email = jwt.verify(emialToken, process.env.JWT_SECRET);
-    email = email.email;
+    let decoded;
+    try {
+      decoded = jwt.verify(emailToken, process.env.JWT_SECRET);
+    } catch (err) {
+      return res.status(400).json({ message: "Invalid or expired email verification token!" });
+    }
+    const email = decoded.email;
 
     const savedOtp = await redisClient.get(`otp:${email}`);
     if (!savedOtp) return res.status(400).json({ message: "OTP expired!" });
@@ -829,4 +843,3 @@ module.exports = {
   verifyOtp,
   sendOtp,
 };
-
