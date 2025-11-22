@@ -21,7 +21,7 @@ const passwordValidation = (password) => {
 // ------------------------------------
 const register = async (req, res) => {
   try {
-    let { name, email, password, phone } = req.body;
+    let { name, email, password, phone, otpChannel } = req.body;
 
     // Capitalize name
     name = formatName(name);
