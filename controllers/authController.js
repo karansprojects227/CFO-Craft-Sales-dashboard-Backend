@@ -187,18 +187,6 @@ const verifyRegisterOtp = async (req, res) => {
     await redisClient.del(`otp:${email}`);
     await redisClient.del(`reg:${email}`);
 
-    // Generate token
-    // const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    //   expiresIn: "7d"
-    // });
-
-    // // Save token in cookie
-    // res.cookie("token", token, {
-    //   httpOnly: true,
-    //   secure: false,
-    //   sameSite: "lax"
-    // });
-
     return res.status(201).json({
       message: "Registered Successfull!",
       userId: user._id
@@ -368,8 +356,8 @@ const verifyLoginOtp = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax"
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
     });
 
     return res.status(200).json({
@@ -410,8 +398,8 @@ const checkPass = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax"
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
     });
 
     return res.status(200).json({
@@ -816,8 +804,8 @@ const verifyOtp = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
     });
     
     return res.status(200).json({
@@ -843,3 +831,4 @@ module.exports = {
   verifyOtp,
   sendOtp,
 };
+
