@@ -19,14 +19,6 @@ router.get(
   }),
   async (req, res) => {
     try {
-
-      console.log("🔥 GOOGLE USER:", req.user);
-
-    if (!req.user) {
-      console.log("❌ Google did NOT return a user");
-      return res.redirect(`${process.env.FRONTEND_URL}/auth/login?error=GoogleUserMissing`);
-    }
-      
       const googleUser = req.user;
 
       // Clear old OTP/temp data
@@ -42,11 +34,11 @@ router.get(
       });
 
       // store email in cookies
-      res.cookie("email_for_verification", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none"
-      });
+      res.cookie("email_for_verification", token , {
+        httpOnly: true,     // cannot be accessed by JS
+        secure: false,      // true only on https
+        sameSite: "lax"
+      })
 
       if (existingUser) {
         // User exists → Still OTP required for login
@@ -250,6 +242,3 @@ router.get(
 );
 
 module.exports = router;
-
-
-
