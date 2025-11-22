@@ -19,6 +19,14 @@ router.get(
   }),
   async (req, res) => {
     try {
+
+      console.log("🔥 GOOGLE USER:", req.user);
+
+    if (!req.user) {
+      console.log("❌ Google did NOT return a user");
+      return res.redirect(`${process.env.FRONTEND_URL}/auth/login?error=GoogleUserMissing`);
+    }
+      
       const googleUser = req.user;
 
       // Clear old OTP/temp data
@@ -242,5 +250,6 @@ router.get(
 );
 
 module.exports = router;
+
 
 
