@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const transporter = require("../config/mail");
+const resend = require("../config/mail");
 const generateOTP = require("../config/generateOTP");
 const formatName = require("../config/formatName");
 const redisClient = require("../config/redis");
@@ -64,7 +64,7 @@ const register = async (req, res) => {
     await redisClient.set(`otp:${email}`, otp, "EX", 300); // 5 min
 
     // Send email
-    await transporter.sendMail({
+    await resend.emails.send({
       from: '"CFO Sales Dashboard" <info@cfocraft.com>',
       to:email,
       subject: "🔐 Your Register Secure OTP Code",
@@ -242,7 +242,7 @@ const login = async (req, res) => {
 
     await redisClient.set(`otp:${email}`, otp, "EX", 300);
 
-    await transporter.sendMail({
+    await resend.emails.send({
       from: '"CFO Sales Dashboard" <info@cfocraft.com>',
       to:email,
       subject: "🔐 Your Login Secure OTP Code",
@@ -569,7 +569,7 @@ const forgotPassword = async (req, res) => {
     });
 
     // 🔹 Send mail
-    await transporter.sendMail(
+    await resend.emails.send(
       mailOptions({
         user,
         resetLink: resetLink,
@@ -676,7 +676,7 @@ const sendOtp = async (req, res) => {
     const otp = generateOTP();
     await redisClient.set(`otp:${email}`, otp, "EX", 300); // ex in 5 minute
 
-    await transporter.sendMail({
+    await resend.emails.send({
       from: '"CFO Sales Dashboard" <info@cfocraft.com>',
       to:email,
       subject: "🔐 Your Secure OTP Code",
@@ -848,3 +848,4 @@ module.exports = {
   verifyOtp,
   sendOtp,
 };
+
