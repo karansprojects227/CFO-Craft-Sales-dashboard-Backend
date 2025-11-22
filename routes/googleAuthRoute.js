@@ -13,7 +13,7 @@ router.get(
 );
 
 router.get(
-  "/api/auth/google/callback",
+  "/google/callback",
   passport.authenticate("google", {
     failureRedirect: `${process.env.FRONTEND_URL}/auth/login?error=GoogleAuthFailed`,
   }),
@@ -242,3 +242,4 @@ router.get(
 );
 
 module.exports = router;
+
