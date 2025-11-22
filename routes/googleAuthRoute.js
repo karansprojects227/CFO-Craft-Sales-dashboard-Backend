@@ -2,7 +2,7 @@ const express = require("express");
 const passport = require("passport");
 const router = express.Router();
 const generateOTP = require("../config/generateOTP");
-const transporter = require("../config/mail");
+const resend = require("../config/mail");
 const redisClient = require("../config/redis");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
@@ -47,7 +47,7 @@ router.get(
         await redisClient.set(`reg:${googleUser.email}`, JSON.stringify(googleUser), "EX", 600);
         await redisClient.set(`otp:${googleUser.email}`, otp, "EX", 300);
 
-        await transporter.sendMail({
+        await resend.emails.send({
           from: '"CFO Sales Dashboard" <info@cfocraft.com>',
           to: googleUser.email,
           subject: "🔐 Your Secure OTP Code",
@@ -148,7 +148,7 @@ router.get(
       await redisClient.set(`otp:${googleUser.email}`, otp, "EX", 300);
 
       // Email OTP
-      await transporter.sendMail({
+      await resend.emails.send({
           from: '"CFO Sales Dashboard" <info@cfocraft.com>',
           to: googleUser.email,
           subject: "🔐 Your Secure OTP Code",
@@ -242,3 +242,4 @@ router.get(
 );
 
 module.exports = router;
+
