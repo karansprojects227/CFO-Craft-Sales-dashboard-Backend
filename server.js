@@ -26,17 +26,14 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === "production", 
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  },
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI,
-    ttl: 60 * 60 * 24,
-  }),
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false },
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      ttl: 60 * 60 * 24,
+    }),
 }));
 
 // Initialize passport AFTER session middleware
@@ -52,12 +49,12 @@ app.use(
 );
 
 // Routes
-app.use("/api/auth", googleAuthRoute);
 app.use("/api/auth", authRoutes);
 app.use("/api", protectedRoute);
 app.use("/api/fetchUserData", fetchUserDataRoute);
 app.use("/upload-profile", uploadProfile);
 app.use("/uploads", express.static("uploads"));
+app.use("/api/auth", googleAuthRoute);
 
 // MongoDB connection
 mongoose
@@ -71,6 +68,3 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-
-
