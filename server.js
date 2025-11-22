@@ -49,12 +49,12 @@ app.use(
 );
 
 // Routes
+app.use("/api/auth", googleAuthRoute);
 app.use("/api/auth", authRoutes);
 app.use("/api", protectedRoute);
 app.use("/api/fetchUserData", fetchUserDataRoute);
 app.use("/upload-profile", uploadProfile);
 app.use("/uploads", express.static("uploads"));
-app.use("/api/auth", googleAuthRoute);
 
 // MongoDB connection
 mongoose
@@ -68,3 +68,4 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
