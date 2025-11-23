@@ -368,8 +368,8 @@ const verifyLoginOtp = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax"
+      secure: true,     // HTTPS required
+      sameSite: "none", // cross-site allowed
     });
 
     return res.status(200).json({
@@ -410,8 +410,8 @@ const checkPass = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax"
+      secure: true,     // HTTPS required
+      sameSite: "none", // cross-site allowed
     });
 
     return res.status(200).json({
@@ -848,6 +848,7 @@ module.exports = {
   verifyOtp,
   sendOtp,
 };
+
 
 
 
