@@ -406,7 +406,7 @@ const checkPass = async (req, res) => {
 // 🚪 LOGOUT
 // ------------------------------------
 const logout = (req, res) => {
-  res.clearCookie("token", {
+  res.clearCookie(("token", "email_for_verification"), {
     httpOnly: true,
     secure: true,     // agar HTTPS hai to
     sameSite: "none", // agar cross-site hai
@@ -836,6 +836,7 @@ module.exports = {
   verifyOtp,
   sendOtp,
 };
+
 
 
 
