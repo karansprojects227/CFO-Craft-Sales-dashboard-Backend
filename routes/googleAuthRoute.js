@@ -6,6 +6,7 @@ const resend = require("../config/mail");
 const redisClient = require("../config/redis");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const generateToken = require("../utils/generateToken");
 
 router.get(
   "/google",
@@ -29,9 +30,7 @@ router.get(
       const existingUser = await User.findOne({ email: googleUser.email });
 
       // Generate token
-      const token = jwt.sign({ email: googleUser.email }, process.env.JWT_SECRET, {
-        expiresIn: "7d"
-      });
+      const token = generateToken({ email: googleUser.email });
 
       // store email in cookies
       res.cookie("email_for_verification", token, {
@@ -254,6 +253,7 @@ router.get(
 );
 
 module.exports = router;
+
 
 
 
