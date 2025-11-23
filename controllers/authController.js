@@ -420,6 +420,10 @@ const logout = (req, res) => {
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
+
+    // Validate
+    if (!email)
+      return res.status(400).json({ message: "Email are required!" });
     
     const user = await User.findOne({ email });
 
@@ -608,6 +612,10 @@ const resetPassword = async (req, res) => {
   try {
     const { userId } = req.params;
     const { password, confirmPassword } = req.body;
+
+    // Validate
+    if (!password || !confirmPassword)
+      return res.status(400).json({ message: "Password are required!" });
 
     if (password !== confirmPassword) {
       res.status(404).json({ error: "Passwords do not match!" });
@@ -828,6 +836,7 @@ module.exports = {
   verifyOtp,
   sendOtp,
 };
+
 
 
 
