@@ -34,11 +34,11 @@ router.get(
       });
 
       // store email in cookies
-      res.cookie("email_for_verification", token , {
-        httpOnly: true,     // cannot be accessed by JS
-        secure: false,      // true only on https
-        sameSite: "lax"
-      })
+      res.cookie("email_for_verification", token, {
+        httpOnly: true,
+        secure: true,     // HTTPS required
+        sameSite: "none", // cross-site allowed
+      });
 
       if (existingUser) {
         // User exists → Still OTP required for login
@@ -242,6 +242,7 @@ router.get(
 );
 
 module.exports = router;
+
 
 
 
