@@ -5,16 +5,8 @@ const resend = require("../config/mail");
 const generateOTP = require("../config/generateOTP");
 const formatName = require("../config/formatName");
 const redisClient = require("../config/redis");
-
-const passwordValidation = (password) => {
-  const errors = [];
-  if (password.length < 8) errors.push("Minimum 8 characters required");
-  if (!/[A-Z]/.test(password)) errors.push("At least 1 uppercase letter required");
-  if (!/[a-z]/.test(password)) errors.push("At least 1 lowercase letter required");
-  if (!/[0-9]/.test(password)) errors.push("At least 1 number required");
-  if (!/[!@#$%^&*]/.test(password)) errors.push("At least 1 special character (!@#$%^&*) required");
-  return errors;
-};
+const generateToken = require("../utils/generateToken");
+const passwordValidation = require("../utils/validatePassword");
 
 // ------------------------------------
 // 🔐 REGISTER (STEP 1 → Send OTP)
@@ -187,18 +179,6 @@ const verifyRegisterOtp = async (req, res) => {
     await redisClient.del(`otp:${email}`);
     await redisClient.del(`reg:${email}`);
 
-    // Generate token
-    // const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    //   expiresIn: "7d"
-    // });
-
-    // // Save token in cookie
-    // res.cookie("token", token, {
-    //   httpOnly: true,
-    //   secure: false,
-    //   sameSite: "lax"
-    // });
-
     return res.status(201).json({
       message: "Registered Successfull!",
       userId: user._id
@@ -362,9 +342,7 @@ const verifyLoginOtp = async (req, res) => {
     await redisClient.del(`otp:${email}`);
 
     // Generate token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d"
-    });
+    const token = generateToken({ id: user._id });
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -404,9 +382,8 @@ const checkPass = async (req, res) => {
     if (!isMatch)
       return res.status(400).json({ message: "Incorrect password!" });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d"
-    });
+    // Generate token
+    const token = generateToken({ id: user._id });
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -815,9 +792,8 @@ const verifyOtp = async (req, res) => {
     await redisClient.del(`otp:${email}`);
     await redisClient.del(`reg:${email}`);
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    // Generate token
+    const token = generateToken({ id: user._id });
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -848,6 +824,7 @@ module.exports = {
   verifyOtp,
   sendOtp,
 };
+
 
 
 
